@@ -14,10 +14,16 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import org.mirea.pm.notes.adapters.NoteListAdapter;
+import org.mirea.pm.notes.adapters.NoteModel;
 import org.mirea.pm.notes.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,23 +38,20 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar);
 
-        findViewById(R.id.button_test).setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                Intent startViewNoteIntent = new Intent(
-                        MainActivity.this,
-                        ViewNoteActivity.class);
-                startActivity(startViewNoteIntent);
-            }
-        });
+        final NoteModel[] list = new NoteModel[20];
+        for (int i = 0; i < 20; i ++) {
+            list[i] = new NoteModel("Sample " + i, new Date());
+        }
 
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        final NoteListAdapter NotesAdapter = new NoteListAdapter(
+                this,
+                list
+        );
+        binding.notesList.setAdapter(NotesAdapter);
+
+        binding.fab.setOnClickListener(view ->
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+                .setAction("Action", null).show());
     }
 
     @Override
