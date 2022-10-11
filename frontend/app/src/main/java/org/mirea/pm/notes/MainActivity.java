@@ -1,18 +1,13 @@
 package org.mirea.pm.notes;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.view.View;
 
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import org.mirea.pm.notes.adapters.NoteListAdapter;
 import org.mirea.pm.notes.adapters.NoteModel;
@@ -20,34 +15,41 @@ import org.mirea.pm.notes.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
-import java.time.LocalDateTime;
+import androidx.appcompat.widget.SearchView;
+
 import java.util.ArrayList;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
+    NoteListAdapter notesAdapter;
+    ArrayList<NoteModel> notesList = new ArrayList<>();
+    org.mirea.pm.notes.databinding.ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        org.mirea.pm.notes.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.toolbar);
 
-        final NoteModel[] list = new NoteModel[20];
+        final ArrayList<NoteModel> list = new ArrayList<>();
         for (int i = 0; i < 20; i ++) {
-            list[i] = new NoteModel("Sample " + i, new Date());
+            list.add(new NoteModel("Sample " + i, new Date()));
         }
 
-        final NoteListAdapter NotesAdapter = new NoteListAdapter(
+        notesList = new ArrayList<>(list);
+
+        notesAdapter = new NoteListAdapter(
                 this,
-                list
+                new ArrayList<>(notesList)
         );
-        binding.notesList.setAdapter(NotesAdapter);
+        binding.notesList.setAdapter(notesAdapter);
 
         binding.fab.setOnClickListener(view ->
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -58,7 +60,40 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+
+        MenuItem search = menu.findItem(R.id.action_search);
+        SearchView sView = (SearchView) search.getActionView();
+
+        sView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                notesAdapter = new NoteListAdapter(
+                        MainActivity.this,
+                        new ArrayList<>(notesList)
+                );
+                binding.notesList.setAdapter(notesAdapter);
+            }
+        });
+
+        sView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                notesAdapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                notesAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
