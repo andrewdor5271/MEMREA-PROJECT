@@ -11,4 +11,5 @@
     <string name="title_activity_view_note">ViewNoteActivity</string>
 
     <string name="datetime_format">MMM dd, yyyy,    HH:mm</string>
+    <string name="type_note_hint">Type your note here…</string>
 </resources>

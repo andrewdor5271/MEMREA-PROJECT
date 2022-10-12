@@ -1,9 +1,6 @@
 package org.mirea.pm.notes.adapters;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Debug;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +12,6 @@ import androidx.annotation.NonNull;
 
 import org.mirea.pm.notes.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,14 +56,9 @@ public class NoteListAdapter extends ArrayAdapter<NoteModel> {
             mViewHolder = (ViewHolder) convertView.getTag();
         }
 
-        @SuppressLint("SimpleDateFormat")
-        SimpleDateFormat dFormat = new SimpleDateFormat(
-                context.getResources().getString(R.string.datetime_format)
-        );
-
         mViewHolder.annotation_text.setText(values.get(position).getText());
         mViewHolder.creation_datetime_text.setText(
-                dFormat.format(values.get(position).getCreationTime())
+                values.get(position).getCreationTimeString(context.getResources().getString(R.string.datetime_format))
         );
 
         return convertView;

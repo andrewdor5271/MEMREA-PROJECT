@@ -1,5 +1,6 @@
 package org.mirea.pm.notes;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -16,6 +17,7 @@ import org.mirea.pm.notes.databinding.ActivityMainBinding;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 
 import androidx.appcompat.widget.SearchView;
 
@@ -50,6 +52,14 @@ public class MainActivity extends AppCompatActivity {
                 new ArrayList<>(notesList)
         );
         binding.notesList.setAdapter(notesAdapter);
+
+        binding.notesList.setOnItemClickListener((parent, view, position, id) -> {
+            Intent intent = new Intent(MainActivity.this, ViewNoteActivity.class);
+            NoteModel note = (NoteModel)parent.getAdapter().getItem(position);
+            intent.putExtra("Text", note.getText());
+            intent.putExtra("DateStr", note.getCreationTimeString(getResources().getString(R.string.datetime_format)));
+            startActivity(intent);
+        });
 
         binding.fab.setOnClickListener(view ->
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)

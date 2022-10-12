@@ -1,8 +1,13 @@
 package org.mirea.pm.notes.adapters;
 
 
+import android.annotation.SuppressLint;
+
 import androidx.annotation.NonNull;
 
+import org.mirea.pm.notes.R;
+
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -21,6 +26,12 @@ public class NoteModel {
 
     public Date getCreationTime() {
         return creationTime;
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    public String getCreationTimeString(String format) {
+        SimpleDateFormat dFormat = new SimpleDateFormat(format);
+        return dFormat.format(getCreationTime());
     }
 
     @NonNull
