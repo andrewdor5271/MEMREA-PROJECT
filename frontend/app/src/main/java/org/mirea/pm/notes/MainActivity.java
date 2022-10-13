@@ -1,10 +1,11 @@
 package org.mirea.pm.notes;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.google.android.material.snackbar.Snackbar;
-
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 
@@ -17,7 +18,6 @@ import org.mirea.pm.notes.databinding.ActivityMainBinding;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 
 import androidx.appcompat.widget.SearchView;
 
@@ -30,10 +30,53 @@ public class MainActivity extends AppCompatActivity {
     private NoteListAdapter notesAdapter;
     private ArrayList<NoteModel> notesList = new ArrayList<>();
     private org.mirea.pm.notes.databinding.ActivityMainBinding binding;
+    private NoteModel noteInEdit = null;
+
+    private void startNoteEdit(NoteModel note) {
+        noteInEdit = note;
+    }
+
+    private void finishNoteEdit(NoteModel edited) {
+        notesAdapter.add(edited);
+        if(noteInEdit != null) {
+            notesAdapter.remove(noteInEdit);
+            noteInEdit = null;
+        }
+    }
+
+    private void cancelNoteEdit() {
+        noteInEdit = null;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // обработчик результата изменения заметки
+        ActivityResultLauncher<Intent> noteEditActivityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        // Activity finished normally
+                        Intent resultData = result.getData();
+                        if(resultData != null && resultData.getBooleanExtra(
+                                ViewNoteActivity.NOTE_EDITED_PARAM_NAME,
+                                false)
+                        ) {
+                            // Processing output here
+                            Date editDate =
+                                    (Date) resultData.getSerializableExtra(ViewNoteActivity.OUTPUT_DATE_PARAM_NAME
+                                    );
+                            NoteModel resultNote = new NoteModel(
+                                    resultData.getStringExtra(ViewNoteActivity.NOTE_TEXT_PARAM_NAME), editDate
+                            );
+                            finishNoteEdit(resultNote);
+                        }
+                        else {
+                            cancelNoteEdit();
+                        }
+                    }
+                });
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -54,16 +97,20 @@ public class MainActivity extends AppCompatActivity {
         binding.notesList.setAdapter(notesAdapter);
 
         binding.notesList.setOnItemClickListener((parent, view, position, id) -> {
+
             Intent intent = new Intent(MainActivity.this, ViewNoteActivity.class);
             NoteModel note = (NoteModel)parent.getAdapter().getItem(position);
             intent.putExtra(ViewNoteActivity.NOTE_TEXT_PARAM_NAME, note.getText());
-            intent.putExtra(ViewNoteActivity.DATE_STR_PARAM_NAME, note.getCreationTimeString(getResources().getString(R.string.datetime_format)));
-            startActivity(intent);
+            intent.putExtra(ViewNoteActivity.INPUT_DATE_STR_PARAM_NAME, note.getCreationTimeString(getResources().getString(R.string.datetime_format)));
+            noteEditActivityResultLauncher.launch(intent);
+            startNoteEdit(note);
         });
 
-        binding.fab.setOnClickListener(view ->
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
+        binding.fab.setOnClickListener(view -> {
+            NoteModel note = new NoteModel("", new Date());
+            notesAdapter.add(note);
+
+        });
     }
 
     @Override
