@@ -27,9 +27,9 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
-    NoteListAdapter notesAdapter;
-    ArrayList<NoteModel> notesList = new ArrayList<>();
-    org.mirea.pm.notes.databinding.ActivityMainBinding binding;
+    private NoteListAdapter notesAdapter;
+    private ArrayList<NoteModel> notesList = new ArrayList<>();
+    private org.mirea.pm.notes.databinding.ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
         binding.notesList.setOnItemClickListener((parent, view, position, id) -> {
             Intent intent = new Intent(MainActivity.this, ViewNoteActivity.class);
             NoteModel note = (NoteModel)parent.getAdapter().getItem(position);
-            intent.putExtra("Text", note.getText());
-            intent.putExtra("DateStr", note.getCreationTimeString(getResources().getString(R.string.datetime_format)));
+            intent.putExtra(ViewNoteActivity.NOTE_TEXT_PARAM_NAME, note.getText());
+            intent.putExtra(ViewNoteActivity.DATE_STR_PARAM_NAME, note.getCreationTimeString(getResources().getString(R.string.datetime_format)));
             startActivity(intent);
         });
 
