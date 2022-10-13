@@ -32,10 +32,12 @@ public class MainActivity extends AppCompatActivity {
     private org.mirea.pm.notes.databinding.ActivityMainBinding binding;
     private NoteModel noteInEdit = null;
 
+    // call when you need to modify existing note
     private void startNoteEdit(NoteModel note) {
         noteInEdit = note;
     }
 
+    // call to add a new note or to modify existing
     private void finishNoteEdit(NoteModel edited) {
         notesAdapter.add(edited);
         if(noteInEdit != null) {
@@ -46,6 +48,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void cancelNoteEdit() {
         noteInEdit = null;
+    }
+
+    private Intent prepareNoteModelAsViewNoteIntent (NoteModel note)
+    {
+        Intent intent = new Intent(MainActivity.this, ViewNoteActivity.class);
+        intent.putExtra(ViewNoteActivity.NOTE_TEXT_PARAM_NAME, note.getText());
+        intent.putExtra(ViewNoteActivity.INPUT_DATE_STR_PARAM_NAME, note.getCreationTimeString(getResources().getString(R.string.datetime_format)));
+        return intent;
     }
 
     @Override
@@ -97,19 +107,14 @@ public class MainActivity extends AppCompatActivity {
         binding.notesList.setAdapter(notesAdapter);
 
         binding.notesList.setOnItemClickListener((parent, view, position, id) -> {
-
-            Intent intent = new Intent(MainActivity.this, ViewNoteActivity.class);
             NoteModel note = (NoteModel)parent.getAdapter().getItem(position);
-            intent.putExtra(ViewNoteActivity.NOTE_TEXT_PARAM_NAME, note.getText());
-            intent.putExtra(ViewNoteActivity.INPUT_DATE_STR_PARAM_NAME, note.getCreationTimeString(getResources().getString(R.string.datetime_format)));
-            noteEditActivityResultLauncher.launch(intent);
+            noteEditActivityResultLauncher.launch(prepareNoteModelAsViewNoteIntent(note));
             startNoteEdit(note);
         });
 
         binding.fab.setOnClickListener(view -> {
             NoteModel note = new NoteModel("", new Date());
-            notesAdapter.add(note);
-
+            noteEditActivityResultLauncher.launch(prepareNoteModelAsViewNoteIntent(note));
         });
     }
 
