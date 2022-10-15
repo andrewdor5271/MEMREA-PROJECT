@@ -1,4 +1,4 @@
-package org.mirea.pm.notes;
+package org.mirea.pm.notes_frontend;
 
 import org.junit.Test;
 

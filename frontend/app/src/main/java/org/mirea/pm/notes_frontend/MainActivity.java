@@ -1,4 +1,4 @@
-package org.mirea.pm.notes;
+package org.mirea.pm.notes_frontend;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,9 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.navigation.ui.AppBarConfiguration;
 
-import org.mirea.pm.notes.adapters.NoteListAdapter;
-import org.mirea.pm.notes.adapters.NoteModel;
-import org.mirea.pm.notes.databinding.ActivityMainBinding;
+import org.mirea.pm.notes_frontend.adapters.NoteListAdapter;
+import org.mirea.pm.notes_frontend.adapters.NoteModel;
+import org.mirea.pm.notes_frontend.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private NoteListAdapter notesAdapter;
     private ArrayList<NoteModel> notesList = new ArrayList<>();
-    private org.mirea.pm.notes.databinding.ActivityMainBinding binding;
+    private org.mirea.pm.notes_frontend.databinding.ActivityMainBinding binding;
     private NoteModel noteInEdit = null;
 
     // call when you need to modify existing note

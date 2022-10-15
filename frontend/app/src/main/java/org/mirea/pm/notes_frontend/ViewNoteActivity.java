@@ -1,4 +1,4 @@
-package org.mirea.pm.notes;
+package org.mirea.pm.notes_frontend;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,7 +9,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
 
-import org.mirea.pm.notes.databinding.ActivityViewNoteBinding;
+import org.mirea.pm.notes_frontend.databinding.ActivityViewNoteBinding;
 
 import java.util.Date;
 
@@ -20,7 +20,7 @@ public class ViewNoteActivity extends AppCompatActivity {
     public static final String NOTE_EDITED_PARAM_NAME = "Changed";
     public static final String OUTPUT_DATE_PARAM_NAME = "DateLong";
 
-    private org.mirea.pm.notes.databinding.ActivityViewNoteBinding binding;
+    private org.mirea.pm.notes_frontend.databinding.ActivityViewNoteBinding binding;
     private Boolean edited = false;
 
     @Override

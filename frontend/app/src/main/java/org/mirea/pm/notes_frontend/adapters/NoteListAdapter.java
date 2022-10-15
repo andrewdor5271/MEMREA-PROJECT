@@ -1,4 +1,4 @@
-package org.mirea.pm.notes.adapters;
+package org.mirea.pm.notes_frontend.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import org.mirea.pm.notes.R;
+import org.mirea.pm.notes_frontend.R;
 
 import java.util.ArrayList;
 import java.util.List;
