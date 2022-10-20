@@ -1,21 +1,28 @@
 package org.mirea.pm.notes_backend.db;
 
-import javax.persistence.GeneratedValue;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import javax.persistence.Id;
-import java.time.format.DateTimeFormatter;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Objects;
 
+@Document(collection = "users")
 public class User {
 
-    public @Id @GeneratedValue String id;
+    private @Id String id;
 
-    public String name;
-    public String passwordHash;
+    @Indexed(unique = true)
+    @NotBlank
+    @Size(max = 20)
+    private String name;
+    @NotBlank
+    private String passwordHash;
 
     public User() {}
 
     public User(String name, String passwordHash) {
-        this.id = id;
         this.name = name;
         this.passwordHash = passwordHash;
     }
