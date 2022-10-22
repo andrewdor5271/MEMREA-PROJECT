@@ -1,13 +1,16 @@
 package org.mirea.pm.notes_backend.controllers.auth.payload;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
-public class LoginRequest {
+public class SignupRequest {
 
     @NotBlank
+    @Size(min = 1, max = 20)
     private String username;
 
     @NotBlank
+    @Size(min = 4, max = 20)
     private String password;
 
     public String getUsername() {

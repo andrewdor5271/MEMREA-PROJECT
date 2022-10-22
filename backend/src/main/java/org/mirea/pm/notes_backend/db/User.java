@@ -15,9 +15,10 @@ public class User {
 
     @Indexed(unique = true)
     @NotBlank
-    @Size(max = 20)
+    @Size(min = 1, max = 20)
     private String name;
     @NotBlank
+    @Size(min = 4, max = 20)
     private String passwordHash;
 
     public User() {}
