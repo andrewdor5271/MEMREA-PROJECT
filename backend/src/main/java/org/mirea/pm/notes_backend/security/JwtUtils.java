@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -24,21 +25,19 @@ import java.util.Objects;
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    @Autowired
-    private Environment env;
-
     @Value("${notes.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-
     private final SecretKeySpec jwtSecret;
 
-    public JwtUtils() throws NullPointerException{
+    public JwtUtils(
+            @Value("${notes.app.keyAlgorithm}") final String keyAlgorithm,
+            @Value("${notes.app.jwtSecret}") final String jwtSecretString
+    ){
         try {
-            //noinspection ConstantConditions
             jwtSecret = new SecretKeySpec(
-                    env.getProperty("notes.app.jwtSecret").getBytes(StandardCharsets.UTF_8),
-                    env.getProperty("notes.app.keyAlgorithm")
+                    jwtSecretString.getBytes(StandardCharsets.UTF_8),
+                    keyAlgorithm
             );
         }
         catch (Exception e) {
