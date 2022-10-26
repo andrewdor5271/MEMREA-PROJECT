@@ -5,21 +5,14 @@ import io.jsonwebtoken.security.SignatureException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.error.MissingEnvironmentVariableException;
 
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.security.PrivateKey;
 import java.util.Date;
-import java.util.Objects;
 
 @Component
 public class JwtUtils {
