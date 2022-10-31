@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.ui.AppBarConfiguration;
 
 import org.mirea.pm.notes_frontend.adapters.NoteListAdapter;
-import org.mirea.pm.notes_frontend.adapters.NoteModel;
+import org.mirea.pm.notes_frontend.datamodels.NoteModel;
 import org.mirea.pm.notes_frontend.databinding.ActivityMainBinding;
 
 import android.view.Menu;

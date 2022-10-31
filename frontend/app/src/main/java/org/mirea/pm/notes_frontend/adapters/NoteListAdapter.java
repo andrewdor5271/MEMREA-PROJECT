@@ -14,6 +14,7 @@ import org.mirea.pm.notes_frontend.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.mirea.pm.notes_frontend.datamodels.NoteModel;
 
 public class NoteListAdapter extends ArrayAdapter<NoteModel> {
 
