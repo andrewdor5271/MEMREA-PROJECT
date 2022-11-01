@@ -1,27 +1,32 @@
 package org.mirea.pm.notes_backend.db;
 
-import javax.persistence.Column;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+@Document(collection = "notes")
 public class Note {
-
-    private final int MAX_TOSTRING_TEXT_LENGTH = 13;
+    @Transient
+    private static final int MAX_TOSTRING_TEXT_LENGTH = 13;
     public @Id String id;
+
+    public String ownerId;
 
     public String text;
 
-    @Column(name = "creation_time", columnDefinition = "TIMESTAMP")
-    public LocalDateTime creationDateTime;
+    public LocalDateTime changedDateTime;
 
     public Note() {}
 
-    public Note(String text, LocalDateTime creationDateTime)
+    public Note(String ownerId, String text, LocalDateTime changedDateTime)
     {
+        this.ownerId = ownerId;
         this.text = text;
-        this.creationDateTime = creationDateTime;
+        this.changedDateTime = changedDateTime;
     }
 
     public String getId() {
@@ -40,12 +45,20 @@ public class Note {
         this.text = text;
     }
 
-    public LocalDateTime getCreationDateTime() {
-        return creationDateTime;
+    public LocalDateTime getChangedDateTime() {
+        return changedDateTime;
     }
 
-    public void setCreationDateTime(LocalDateTime creationDateTime) {
-        this.creationDateTime = creationDateTime;
+    public void setChangedDateTimeDateTime(LocalDateTime changedDateTime) {
+        this.changedDateTime = changedDateTime;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 
     @Override
@@ -59,20 +72,21 @@ public class Note {
         }
         return id.equals(otherNote.getId()) &&
                 text.equals(otherNote.getText()) &&
-                creationDateTime.equals(otherNote.getCreationDateTime());
+                changedDateTime.equals(otherNote.getChangedDateTime());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, text, creationDateTime);
+        return Objects.hash(id, ownerId, text, changedDateTime);
     }
 
     @Override
     public String toString() {
-        return String.format("Note(id=%s, text=%s, creationDate=%s)",
+        return String.format("Note(id=%s, owner_id=%s, text=%s, creationDate=%s)",
                 id,
+                ownerId,
                 text.length() <= MAX_TOSTRING_TEXT_LENGTH ?
                         text : text.substring(0, MAX_TOSTRING_TEXT_LENGTH - 3) + "...",
-                DateTimeFormatter.ofPattern("dd.MMMM.yyyy").format(creationDateTime));
+                DateTimeFormatter.ofPattern("dd.MMMM.yyyy").format(changedDateTime));
     }
 }
