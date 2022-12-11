@@ -12,13 +12,13 @@ import java.util.Objects;
 public class Note {
     @Transient
     private static final int MAX_TOSTRING_TEXT_LENGTH = 13;
-    public @Id String id;
+    private @Id String id;
 
-    public String ownerId;
+    private String ownerId;
 
-    public String text;
+    private String text;
 
-    public LocalDateTime changedDateTime;
+    private LocalDateTime changedDateTime;
 
     public Note() {}
 

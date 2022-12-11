@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Collections;
-import java.util.Set;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -37,16 +36,16 @@ public class AuthController {
     JwtUtils jwtUtils;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest request) {
 
-        if(!userRepository.existsByName(loginRequest.getUsername())) {
+        if(!userRepository.existsByName(request.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body(new InvalidSignInResponse());
         }
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
@@ -57,15 +56,15 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (userRepository.existsByName(signUpRequest.getUsername())) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest request) {
+        if (userRepository.existsByName(request.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body(new InvalidSignUpResponse());
         }
 
-        User user = new User(signUpRequest.getUsername(),
-                encoder.encode(signUpRequest.getPassword()));
+        User user = new User(request.getUsername(),
+                encoder.encode(request.getPassword()));
 
         Role userRole = roleRepository.findByName(ERole.ROLE_USER)
                 .orElseThrow(() -> new RuntimeException("Error: User role is not found."));
