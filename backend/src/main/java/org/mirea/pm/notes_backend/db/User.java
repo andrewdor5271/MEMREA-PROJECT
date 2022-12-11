@@ -1,12 +1,15 @@
 package org.mirea.pm.notes_backend.db;
 
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Id;
+import org.springframework.data.annotation.Id;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Document(collection = "users")
 public class User {
@@ -20,6 +23,11 @@ public class User {
     @NotBlank
     @Size(min = 4, max = 20)
     private String passwordHash;
+
+
+
+    @DBRef
+    private Set<Role> roles = new HashSet<>();
 
     public User() {}
 
@@ -50,6 +58,14 @@ public class User {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     @Override

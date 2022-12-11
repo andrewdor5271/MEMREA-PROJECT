@@ -1,8 +1,7 @@
 package org.mirea.pm.notes_backend.controllers.auth;
 
 import org.mirea.pm.notes_backend.controllers.auth.payload.*;
-import org.mirea.pm.notes_backend.db.User;
-import org.mirea.pm.notes_backend.db.UserRepository;
+import org.mirea.pm.notes_backend.db.*;
 import org.mirea.pm.notes_backend.security.JwtUtils;
 import org.mirea.pm.notes_backend.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collections;
+import java.util.Set;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -25,6 +26,9 @@ public class AuthController {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    RoleRepository roleRepository;
 
     @Autowired
     PasswordEncoder encoder;
@@ -62,6 +66,11 @@ public class AuthController {
 
         User user = new User(signUpRequest.getUsername(),
                 encoder.encode(signUpRequest.getPassword()));
+
+        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("Error: User role is not found."));
+
+        user.setRoles(Collections.singleton(userRole));
 
         userRepository.save(user);
 

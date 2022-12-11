@@ -2,8 +2,8 @@ package org.mirea.pm.notes_backend.db;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;

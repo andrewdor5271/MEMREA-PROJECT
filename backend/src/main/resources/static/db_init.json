@@ -1,0 +1,6 @@
+[
+  {
+    "_class": "org.mirea.pm.notes_backend.db.Role",
+    "name": "ROLE_USER"
+  }
+]
