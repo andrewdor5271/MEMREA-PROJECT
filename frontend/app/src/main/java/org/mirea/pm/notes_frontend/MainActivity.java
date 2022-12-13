@@ -126,21 +126,6 @@ public class MainActivity extends AppCompatActivity {
         MenuItem search = menu.findItem(R.id.action_search);
         SearchView sView = (SearchView) search.getActionView();
 
-        sView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-            @Override
-            public void onViewAttachedToWindow(View v) {
-            }
-
-            @Override
-            public void onViewDetachedFromWindow(View v) {
-                notesAdapter = new NoteListAdapter(
-                        MainActivity.this,
-                        new ArrayList<>(notesList)
-                );
-                binding.notesList.setAdapter(notesAdapter);
-            }
-        });
-
         sView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

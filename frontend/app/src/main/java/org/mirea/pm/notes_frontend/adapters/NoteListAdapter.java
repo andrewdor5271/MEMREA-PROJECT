@@ -86,16 +86,14 @@ public class NoteListAdapter extends ArrayAdapter<NoteModel> {
         protected FilterResults performFiltering(CharSequence rawQuery) {
             String query = rawQuery.toString().toLowerCase();
             FilterResults result = new FilterResults();
-            if (query.length() > 0) {
-                ArrayList<NoteModel> filtered = new ArrayList<>();
+            ArrayList<NoteModel> filtered = new ArrayList<>();
 
-                for (NoteModel note : notes) {
-                    if (note.toString().toLowerCase().contains(query))
-                        filtered.add(note);
-                }
-                result.count = filtered.size();
-                result.values = filtered;
+            for (NoteModel note : notes) {
+                if (note.toString().toLowerCase().contains(query))
+                    filtered.add(note);
             }
+            result.count = filtered.size();
+            result.values = filtered;
             return result;
         }
 
