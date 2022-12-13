@@ -6,6 +6,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface NoteRepository extends MongoRepository<Note, String>{
-    List<Note> findByOwnerIdAndChangedDateTimeGreaterThan(String owner, LocalDateTime creationDateTime);
-    List<Note> findByOwnerId(String owner);
+    List<Note> findByOwnerAndChangedDateTimeGreaterThan(User owner, LocalDateTime creationDateTime);
+    List<Note> findByOwner(User owner);
 }

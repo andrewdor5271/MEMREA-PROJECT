@@ -24,8 +24,6 @@ public class User {
     @Size(min = 4, max = 20)
     private String passwordHash;
 
-
-
     @DBRef
     private Set<Role> roles = new HashSet<>();
 

@@ -1,5 +1,6 @@
 package org.mirea.pm.notes_backend.db;
 
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import org.springframework.data.annotation.Id;
@@ -14,7 +15,8 @@ public class Note {
     private static final int MAX_TOSTRING_TEXT_LENGTH = 13;
     private @Id String id;
 
-    private String ownerId;
+    @DBRef
+    private User owner;
 
     private String text;
 
@@ -22,9 +24,9 @@ public class Note {
 
     public Note() {}
 
-    public Note(String ownerId, String text, LocalDateTime changedDateTime)
+    public Note(User owner, String text, LocalDateTime changedDateTime)
     {
-        this.ownerId = ownerId;
+        this.owner = owner;
         this.text = text;
         this.changedDateTime = changedDateTime;
     }
@@ -49,16 +51,16 @@ public class Note {
         return changedDateTime;
     }
 
-    public void setChangedDateTimeDateTime(LocalDateTime changedDateTime) {
+    public void setChangedDateTime(LocalDateTime changedDateTime) {
         this.changedDateTime = changedDateTime;
     }
 
-    public String getOwnerId() {
-        return ownerId;
+    public User getOwner() {
+        return owner;
     }
 
-    public void setOwnerId(String ownerId) {
-        this.ownerId = ownerId;
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     @Override
@@ -77,14 +79,14 @@ public class Note {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, ownerId, text, changedDateTime);
+        return Objects.hash(id, owner, text, changedDateTime);
     }
 
     @Override
     public String toString() {
         return String.format("Note(id=%s, owner_id=%s, text=%s, creationDate=%s)",
                 id,
-                ownerId,
+                owner.getId(),
                 text.length() <= MAX_TOSTRING_TEXT_LENGTH ?
                         text : text.substring(0, MAX_TOSTRING_TEXT_LENGTH - 3) + "...",
                 DateTimeFormatter.ofPattern("dd.MMMM.yyyy").format(changedDateTime));
