@@ -4,6 +4,7 @@ package org.mirea.pm.notes_frontend.datamodels;
 import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
+import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -15,9 +16,10 @@ import java.util.Date;
 @Entity
 public class NoteModel {
     @PrimaryKey
-    long id;
-    String text;
-    Date creationTime;
+    public long noteModelId;
+    public String text;
+    @Embedded
+    public Date creationTime;
 
     public NoteModel(String text, Date creationTime) {
         this.text = text;
