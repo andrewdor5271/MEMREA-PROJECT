@@ -18,5 +18,7 @@
     <string name="auth_password_hint">Password…</string>
     <string name="auth_repeat_password_hint">Repeat password…</string>
     <string name="auth_signin_button_name">Sign In</string>
-    <string name="auth_signup_button_name">Sign In</string>
+    <string name="auth_signin_to_signup_button_name">sign up</string>
+    <string name="auth_signup_to_signin_button_name">sign in</string>
+    <string name="auth_signup_button_name">Sign Up</string>
 </resources>

@@ -116,6 +116,9 @@ public class MainActivity extends AppCompatActivity {
             NoteModel note = new NoteModel("", new Date());
             noteEditActivityResultLauncher.launch(prepareNoteModelAsViewNoteIntent(note));
         });
+
+        Intent intent = new Intent(MainActivity.this, AuthActivity.class);
+        startActivity(intent);
     }
 
     @Override

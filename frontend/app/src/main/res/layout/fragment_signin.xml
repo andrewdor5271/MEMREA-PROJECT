@@ -63,6 +63,18 @@
             app:layout_constraintTop_toBottomOf="@+id/editTextPassword" />
 
         <TextView
+            android:id="@+id/signupButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/auth_signin_to_signup_button_name"
+            android:textColor="@color/teal_700"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/submitButton" />
+
+        <TextView
             android:id="@+id/errorLine"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -72,7 +84,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/submitButton" />
+            app:layout_constraintTop_toBottomOf="@+id/signupButton" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>
