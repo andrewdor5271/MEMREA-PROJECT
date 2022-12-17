@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class JwtStorage {
     private static final String FILENAME = "jwt.txt";
@@ -20,7 +21,7 @@ public class JwtStorage {
         }
     }
 
-    public static String retrieve(Context context, String token) {
+    public static String retrieve(Context context) {
         try (FileInputStream fis = context.openFileInput((FILENAME))) {
             BufferedReader br = new BufferedReader(
                     new InputStreamReader(fis, StandardCharsets.UTF_8));

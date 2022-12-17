@@ -52,6 +52,17 @@ public class JwtUtils {
                 .compact();
     }
 
+    public String generateJwtToken(String username) {
+        Date currentDateTime = new Date();
+
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(currentDateTime)
+                .setExpiration(new Date(currentDateTime.getTime() + jwtExpirationMs))
+                .signWith(jwtSecret)
+                .compact();
+    }
+
     public String getUserNameFromJwtToken(String token) {
         return Jwts.
                 parserBuilder().

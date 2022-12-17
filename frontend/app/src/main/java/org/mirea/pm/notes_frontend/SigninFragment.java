@@ -87,7 +87,7 @@ public class SigninFragment extends Fragment {
                 switch (connection.getResponseCode())
                 {
                     case 200:
-                        readResponse(connection.getInputStream());
+                        processResponse(connection.getInputStream());
                         break;
                     case 400:
                     case 401:
@@ -117,7 +117,7 @@ public class SigninFragment extends Fragment {
         binding.errorLine.setText(error);
     }
 
-    private void readResponse(InputStream stream) throws IOException {
+    private void processResponse(InputStream stream) throws IOException {
         InputStreamReader reader = new InputStreamReader(
                 stream, StandardCharsets.UTF_8);
         JsonReader jsonReader = new JsonReader(reader);

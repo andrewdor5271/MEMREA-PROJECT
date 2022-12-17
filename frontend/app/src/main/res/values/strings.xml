@@ -32,6 +32,7 @@
     <string name="socket">10.0.2.2:8080</string>
     <string name="url_signup">%1$s%2$s/api/auth/signup</string>
     <string name="url_signin">%1$s%2$s/api/auth/signin</string>
+    <string name="url_extend_token">%1$s%2$s/api/auth/extend</string>
 
     <string name="bad_request_signin_error_message">Username or password incorrect</string>
     <string name="bad_request_signup_error_message">Username already taken</string>
