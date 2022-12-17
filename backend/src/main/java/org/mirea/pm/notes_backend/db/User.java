@@ -21,7 +21,7 @@ public class User {
     @Size(min = 1, max = 20)
     private String name;
     @NotBlank
-    @Size(min = 4, max = 20)
+    @Size(min = 4, max = 30)
     private String passwordHash;
 
     @DBRef
