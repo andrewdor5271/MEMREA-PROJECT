@@ -119,7 +119,7 @@ public class SignupFragment extends Fragment {
         if(connection.getResponseCode() != 200) {
             return getString(R.string.default_auth_error_message);
         }
-        readSigninResponse(connection.getInputStream());
+        processSigninResponse(connection.getInputStream());
         return "";
     }
 
@@ -163,7 +163,7 @@ public class SignupFragment extends Fragment {
         binding.errorLine.setText(error);
     }
 
-    private void readSigninResponse(InputStream stream) throws IOException {
+    private void processSigninResponse(InputStream stream) throws IOException {
         InputStreamReader reader = new InputStreamReader(
                 stream, StandardCharsets.UTF_8);
         JsonReader jsonReader = new JsonReader(reader);

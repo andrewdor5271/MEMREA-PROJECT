@@ -14,23 +14,89 @@ import androidx.navigation.ui.AppBarConfiguration;
 import org.mirea.pm.notes_frontend.adapters.NoteListAdapter;
 import org.mirea.pm.notes_frontend.adapters.NoteModel;
 import org.mirea.pm.notes_frontend.databinding.ActivityMainBinding;
+import org.mirea.pm.notes_frontend.util_storage.JwtStorage;
 
+import android.util.JsonReader;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.appcompat.widget.SearchView;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
+    private String jwt;
     private AppBarConfiguration appBarConfiguration;
     private NoteListAdapter notesAdapter;
     private ArrayList<NoteModel> notesList = new ArrayList<>();
     private org.mirea.pm.notes_frontend.databinding.ActivityMainBinding binding;
     private NoteModel noteInEdit = null;
+
+    public void authActivity() {
+        Intent intent = new Intent(MainActivity.this, AuthActivity.class);
+        startActivity(intent);
+    }
+
+    public void processAuthResponse(InputStream stream) throws IOException {
+        InputStreamReader reader = new InputStreamReader(
+                stream, StandardCharsets.UTF_8);
+        JsonReader jsonReader = new JsonReader(reader);
+
+        jsonReader.beginObject();
+        while (jsonReader.hasNext()) {
+            if(jsonReader.nextName().equals("token")) {
+                String token = jsonReader.nextString();
+
+                JwtStorage.save(this, token);
+            }
+            else {
+                jsonReader.skipValue();
+            }
+        }
+    }
+
+    public void updateAuth() {
+        String oldJwt = JwtStorage.retrieve(this);
+        if (oldJwt.isEmpty()) {
+            authActivity();
+        }
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            String protocol = getString(R.string.protocol);
+            String socket = getString(R.string.socket);
+            try {
+                URL url = new URL(getString(R.string.url_extend_token, protocol, socket));
+
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Accept", "application/json");
+                connection.setRequestProperty("Authorization", "Bearer " + oldJwt);
+
+                if(connection.getResponseCode() == 200) {
+                    processAuthResponse(connection.getInputStream());
+                }
+                else {
+                    runOnUiThread(this::authActivity);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
     // call when you need to modify existing note
     private void startNoteEdit(NoteModel note) {
@@ -117,8 +183,7 @@ public class MainActivity extends AppCompatActivity {
             noteEditActivityResultLauncher.launch(prepareNoteModelAsViewNoteIntent(note));
         });
 
-        Intent intent = new Intent(MainActivity.this, AuthActivity.class);
-        startActivity(intent);
+        updateAuth();
     }
 
     @Override
