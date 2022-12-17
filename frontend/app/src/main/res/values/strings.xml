@@ -26,6 +26,7 @@
     <string name="auth_error_long_username">Username Too Long (max 20 symbols)</string>
     <string name="auth_error_short_password">Password Too Short (min 4 symbols)</string>
     <string name="auth_error_long_password">Password Too Long (max 30 symbols)</string>
+    <string name="auth_error_password_match">Password confirmation does not match password</string>
 
     <string name="protocol">http://</string>
     <string name="socket">10.0.2.2:8080</string>
@@ -33,6 +34,7 @@
     <string name="url_signin">%1$s%2$s/api/auth/signin</string>
 
     <string name="bad_request_signin_error_message">Username or password incorrect</string>
-    <string name="default_signin_error_message">Unknown network or server error</string>
+    <string name="bad_request_signup_error_message">Username already taken</string>
+    <string name="default_auth_error_message">Unknown network or server error</string>
 
 </resources>

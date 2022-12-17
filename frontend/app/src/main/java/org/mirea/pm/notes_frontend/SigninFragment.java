@@ -1,6 +1,5 @@
 package org.mirea.pm.notes_frontend;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,7 +14,6 @@ import android.view.ViewGroup;
 import org.mirea.pm.notes_frontend.databinding.FragmentSigninBinding;
 import org.mirea.pm.notes_frontend.util_storage.JwtStorage;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -96,12 +94,12 @@ public class SigninFragment extends Fragment {
                         error = getString(R.string.bad_request_signin_error_message);
                         break;
                     default:
-                        error = getString(R.string.default_signin_error_message);
+                        error = getString(R.string.default_auth_error_message);
                         break;
                 }
 
             } catch (IOException e) {
-                error = getString(R.string.default_signin_error_message);
+                error = getString(R.string.default_auth_error_message);
                 e.printStackTrace();
             }
             finally {
