@@ -94,12 +94,12 @@ public class SigninFragment extends Fragment {
                         error = getString(R.string.bad_request_signin_error_message);
                         break;
                     default:
-                        error = getString(R.string.default_auth_error_message);
+                        error = getString(R.string.default_network_error_message);
                         break;
                 }
 
             } catch (IOException e) {
-                error = getString(R.string.default_auth_error_message);
+                error = getString(R.string.default_network_error_message);
                 e.printStackTrace();
             }
             finally {

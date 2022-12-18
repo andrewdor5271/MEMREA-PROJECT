@@ -88,7 +88,7 @@ public class SignupFragment extends Fragment {
                 case 401:
                     return getString(R.string.bad_request_signup_error_message);
                 default:
-                    return getString(R.string.default_auth_error_message);
+                    return getString(R.string.default_network_error_message);
             }
     }
 
@@ -117,7 +117,7 @@ public class SignupFragment extends Fragment {
         }
 
         if(connection.getResponseCode() != 200) {
-            return getString(R.string.default_auth_error_message);
+            return getString(R.string.default_network_error_message);
         }
         processSigninResponse(connection.getInputStream());
         return "";
@@ -132,7 +132,7 @@ public class SignupFragment extends Fragment {
             try {
                 error = requestSignup(username, password);
             } catch (IOException e) {
-                error = getString(R.string.default_auth_error_message);
+                error = getString(R.string.default_network_error_message);
                 e.printStackTrace();
             }
 
@@ -145,7 +145,7 @@ public class SignupFragment extends Fragment {
             try {
                 error = requestSignin(username, password);
             } catch (IOException e) {
-                error = getString(R.string.default_auth_error_message);
+                error = getString(R.string.default_network_error_message);
                 e.printStackTrace();
             }
             finally {
