@@ -19,13 +19,13 @@ import org.mirea.pm.notes_frontend.util_storage.JwtStorage;
 import android.util.JsonReader;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.SearchView;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -48,6 +48,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void networkErrorToast() {
+        Toast.makeText(this, getString(R.string.default_network_error_message), Toast.LENGTH_SHORT).show();
+    }
+
     public void processAuthResponse(InputStream stream) throws IOException {
         InputStreamReader reader = new InputStreamReader(
                 stream, StandardCharsets.UTF_8);
@@ -66,10 +70,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void processUserDataResponseAndStartUserDialog(InputStream stream) throws IOException {
+        InputStreamReader reader = new InputStreamReader(
+                stream, StandardCharsets.UTF_8);
+        JsonReader jsonReader = new JsonReader(reader);
+
+        jsonReader.beginObject();
+        while (jsonReader.hasNext()) {
+            if(jsonReader.nextName().equals("username")) {
+                String username = jsonReader.nextString();
+
+                runOnUiThread(() -> {
+                    UserDialogFragment
+                            .newInstance(username)
+                            .show(getSupportFragmentManager(), UserDialogFragment.TAG);
+                });
+            }
+            else {
+                jsonReader.skipValue();
+            }
+        }
+    }
+
     public void updateAuth() {
         String oldJwt = JwtStorage.retrieve(this);
         if (oldJwt.isEmpty()) {
             authActivity();
+            return;
         }
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -88,8 +115,41 @@ public class MainActivity extends AppCompatActivity {
                 if(connection.getResponseCode() == 200) {
                     processAuthResponse(connection.getInputStream());
                 }
-                else {
+                else if(connection.getResponseCode() == 401) {
                     runOnUiThread(this::authActivity);
+                }
+                else {
+                    networkErrorToast();
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void userDetailsRequestAndDialog() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            String protocol = getString(R.string.protocol);
+            String socket = getString(R.string.socket);
+            try {
+                URL url = new URL(getString(R.string.url_user_data, protocol, socket));
+
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Accept", "application/json");
+                connection.setRequestProperty("Authorization", "Bearer " + jwt);
+
+                if(connection.getResponseCode() == 200) {
+                    processUserDataResponseAndStartUserDialog(connection.getInputStream());
+                }
+                else if(connection.getResponseCode() == 401) {
+                    runOnUiThread(this::authActivity);
+                }
+                else {
+                    networkErrorToast();
                 }
 
             } catch (IOException e) {
@@ -184,6 +244,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         updateAuth();
+
+        jwt = JwtStorage.retrieve(this);
     }
 
     @Override
@@ -218,8 +280,8 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_user) {
+            userDetailsRequestAndDialog();
             return true;
         }
 
