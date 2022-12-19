@@ -1,18 +1,23 @@
-package org.mirea.pm.notes_frontend.adapters;
+package org.mirea.pm.notes_frontend.datamodels;
 
 
 import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
-
-import org.mirea.pm.notes_frontend.R;
+import androidx.room.Embedded;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+@Entity
 public class NoteModel {
-    String text;
-    Date creationTime;
+    @PrimaryKey
+    public long noteModelId;
+    public String text;
+    @Embedded
+    public Date creationTime;
 
     public NoteModel(String text, Date creationTime) {
         this.text = text;
