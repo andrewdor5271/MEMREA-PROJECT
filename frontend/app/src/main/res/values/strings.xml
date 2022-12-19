@@ -46,4 +46,6 @@
 
     <string name="username_line_text">Username: %1$s</string>
 
+    <string name="action_delete_note">Delete</string>
+
 </resources>
