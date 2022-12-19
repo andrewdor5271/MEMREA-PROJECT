@@ -8,8 +8,6 @@ import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import org.mirea.pm.notes_frontend.R;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

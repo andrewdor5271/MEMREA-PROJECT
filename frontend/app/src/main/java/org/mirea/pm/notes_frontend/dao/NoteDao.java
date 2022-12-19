@@ -12,7 +12,7 @@ import java.util.List;
 
 @Dao
 public interface NoteDao {
-    @Query("SELECT * FROM notemodel")
+    @Query("SELECT * FROM NoteModel")
     List<NoteModel> getAll();
 
     @Insert

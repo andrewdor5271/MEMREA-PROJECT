@@ -113,8 +113,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         binding.fab.setOnClickListener(view -> {
-            NoteModel note = new NoteModel("", new Date());
-            noteEditActivityResultLauncher.launch(prepareNoteModelAsViewNoteIntent(note));
+            NoteModel noteModel = new NoteModel("", new Date());
+            noteEditActivityResultLauncher.launch(prepareNoteModelAsViewNoteIntent(noteModel));
         });
     }
 
