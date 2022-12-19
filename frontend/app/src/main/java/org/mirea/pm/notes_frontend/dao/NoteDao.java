@@ -8,11 +8,12 @@ import androidx.room.Update;
 
 import org.mirea.pm.notes_frontend.datamodels.NoteModel;
 
+import java.util.Date;
 import java.util.List;
 
 @Dao
 public interface NoteDao {
-    @Query("SELECT * FROM NoteModel")
+    @Query("SELECT * FROM notes")
     List<NoteModel> getAll();
 
     @Insert
@@ -23,4 +24,7 @@ public interface NoteDao {
 
     @Delete
     void delete(NoteModel note);
+
+    @Query("UPDATE notes SET text = :text, updateDate = :updateDate WHERE mongoId = :mongoId")
+    void updateByMongoId(String mongoId, String text, Date updateDate);
 }

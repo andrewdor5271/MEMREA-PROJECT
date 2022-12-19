@@ -11,31 +11,43 @@ import androidx.room.PrimaryKey;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@Entity
+@Entity(tableName = "notes")
 public class NoteModel {
     @PrimaryKey
-    public long noteModelId;
-    public String text;
-    @Embedded
-    public Date creationTime;
+    public long id;
 
-    public NoteModel(String text, Date creationTime) {
+    public String mongoId;
+
+    public String text;
+
+    public Date updateDate;
+
+    public NoteModel(String text, Date updateDate) {
+        this.mongoId = "";
         this.text = text;
-        this.creationTime = creationTime;
+        this.updateDate = updateDate;
+    }
+
+    public String getMongoId() {
+        return mongoId;
+    }
+
+    public void setMongoId(String mongoId) {
+        this.mongoId = mongoId;
     }
 
     public String getText() {
         return text;
     }
 
-    public Date getCreationTime() {
-        return creationTime;
+    public Date getUpdateDate() {
+        return updateDate;
     }
 
     @SuppressLint("SimpleDateFormat")
     public String getCreationTimeString(String format) {
         SimpleDateFormat dFormat = new SimpleDateFormat(format);
-        return dFormat.format(getCreationTime());
+        return dFormat.format(getUpdateDate());
     }
 
     @NonNull
