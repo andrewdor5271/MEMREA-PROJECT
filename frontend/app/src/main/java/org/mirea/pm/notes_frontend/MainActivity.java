@@ -36,7 +36,6 @@ import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String jwt;
     private AppBarConfiguration appBarConfiguration;
     private NoteListAdapter notesAdapter;
     private ArrayList<NoteModel> notesList = new ArrayList<>();
@@ -140,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                 connection.setRequestMethod("GET");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("Accept", "application/json");
-                connection.setRequestProperty("Authorization", "Bearer " + jwt);
+                connection.setRequestProperty("Authorization", "Bearer " + JwtStorage.retrieve(this));
 
                 if(connection.getResponseCode() == 200) {
                     processUserDataResponseAndStartUserDialog(connection.getInputStream());
@@ -244,8 +243,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         updateAuth();
-
-        jwt = JwtStorage.retrieve(this);
     }
 
     @Override
