@@ -13,7 +13,7 @@ import java.util.Date;
 
 @Entity(tableName = "notes")
 public class NoteModel {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     public long id;
 
     public String mongoId;

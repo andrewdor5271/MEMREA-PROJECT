@@ -1,5 +1,4 @@
 package org.mirea.pm.notes_backend.controllers.note;
-import org.mirea.pm.notes_backend.controllers.auth.payload.InvalidSignUpResponse;
 import org.mirea.pm.notes_backend.controllers.note.payload.*;
 import org.mirea.pm.notes_backend.db.Note;
 import org.mirea.pm.notes_backend.db.NoteRepository;
@@ -7,7 +6,6 @@ import org.mirea.pm.notes_backend.db.User;
 import org.mirea.pm.notes_backend.db.UserRepository;
 import org.mirea.pm.notes_backend.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,7 +39,10 @@ public class NotesController {
     public ResponseEntity<?> all() {
         UserDetailsImpl userDetails = getUserDetails();
         User owner = getOwner(userDetails.getId());
-        List<Note> userNotes = noteRepository.findByOwner(owner);
+        List<NoteStructure> userNotes =
+                noteRepository.findByOwner(owner).stream().map(note ->
+                        new NoteStructure(note.getText(), note.getChangedDateTime(), note.getId()))
+                        .toList();
         return ResponseEntity.ok(new NotesListResponse(userNotes));
     }
 
@@ -50,8 +51,10 @@ public class NotesController {
     public ResponseEntity<?> changes(@Valid @RequestBody UserChangedNoteRequest request) {
         UserDetailsImpl userDetails = getUserDetails();
         User owner = getOwner(userDetails.getId());
-        List<Note> newUserNotes = noteRepository.findByOwnerAndChangedDateTimeGreaterThan(
-                owner, request.getChangeTime());
+        List<NoteStructure> newUserNotes = noteRepository.findByOwnerAndChangedDateTimeGreaterThan(
+                owner, request.getChangeTime()).stream().map(note ->
+                        new NoteStructure(note.getText(), note.getChangedDateTime(), note.getId()))
+                .toList();
         return ResponseEntity.ok(new NotesListResponse(newUserNotes));
     }
 
@@ -98,7 +101,7 @@ public class NotesController {
             note = noteRepository.findById(request.getId()).get();
         }
         catch (NoSuchElementException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok().build();
         }
 
         User owner = getOwner(userDetails.getId());
@@ -109,5 +112,47 @@ public class NotesController {
 
         noteRepository.delete(note);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/upload_sync")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> upload_sync(@Valid @RequestBody UploadSyncRequest request) {
+        UserDetailsImpl userDetails = getUserDetails();
+
+        try {
+            User user = userRepository.findByName(userDetails.getUsername()).get();
+
+            noteRepository.deleteByIdNotInAndOwner(
+                    request.getNotes().stream()
+                            .map(NoteStructure::getId)
+                            .filter(id -> !Objects.equals(id, "")).toList(),
+                    user);
+
+            for(NoteStructure elem : request.getNotes()) {
+                Note note = noteRepository.findById(elem.getId()).orElse(null);
+                if(note == null) {
+                    continue;
+                }
+                if(!note.getOwner().equals(user)) {
+                    continue;
+                }
+                note.setText(elem.getText());
+                note.setChangedDateTime(elem.getUpdateTime());
+                noteRepository.save(note);
+            }
+
+            List<Note> newNotes = noteRepository.saveAll(request.getNotes().stream()
+                            .filter(noteStructure -> Objects.equals(noteStructure.getId(), ""))
+                            .map(noteStructure ->
+                                    new Note(user, noteStructure.getText(), noteStructure.getUpdateTime())
+                            ).toList());
+
+            return ResponseEntity.ok(new NotesListResponse(newNotes.stream()
+                            .map(note -> new NoteStructure(note.getText(), note.getChangedDateTime(), note.getId()))
+                            .toList()));
+        }
+        catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

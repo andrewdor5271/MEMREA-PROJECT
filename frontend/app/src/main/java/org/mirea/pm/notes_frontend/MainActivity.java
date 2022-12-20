@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.ui.AppBarConfiguration;
 
 import org.mirea.pm.notes_frontend.adapters.NoteListAdapter;
+import org.mirea.pm.notes_frontend.data_managers.NoteManager;
 import org.mirea.pm.notes_frontend.datamodels.NoteModel;
 import org.mirea.pm.notes_frontend.databinding.ActivityMainBinding;
 import org.mirea.pm.notes_frontend.util_storage.JwtStorage;
@@ -19,6 +20,7 @@ import org.mirea.pm.notes_frontend.util_storage.JwtStorage;
 import android.util.JsonReader;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.SearchView;
@@ -31,15 +33,22 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
+    private NoteManager noteManager;
     private NoteListAdapter notesAdapter;
     private ArrayList<NoteModel> notesList = new ArrayList<>();
+
     private org.mirea.pm.notes_frontend.databinding.ActivityMainBinding binding;
+    private Menu menu;
+
     private NoteModel noteInEdit = null;
 
     public void authActivity() {
@@ -158,17 +167,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // call when you need to modify existing note
-    private void startNoteEdit(NoteModel note) {
+    public void startNoteEdit(NoteModel note) {
         noteInEdit = note;
     }
 
     // call to add a new note or to modify existing
-    private void finishNoteEdit(NoteModel edited) {
-        notesAdapter.add(edited);
+    public void finishNoteEdit(NoteModel edited) {
         if(noteInEdit != null) {
+            edited.mongoId = noteInEdit.mongoId;
+            edited.id = noteInEdit.id;
             notesAdapter.remove(noteInEdit);
             noteInEdit = null;
+            noteManager.updateNote(edited);
         }
+        else {
+            noteManager.createNote(edited);
+        }
+        notesAdapter.add(edited);
+    }
+
+    public void deleteNote(NoteModel note) {
+        notesAdapter.remove(note);
+        noteManager.deleteNote(note);
     }
 
     private void cancelNoteEdit() {
@@ -181,6 +201,44 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(ViewNoteActivity.NOTE_TEXT_PARAM_NAME, note.getText());
         intent.putExtra(ViewNoteActivity.INPUT_DATE_STR_PARAM_NAME, note.getCreationTimeString(getResources().getString(R.string.datetime_format)));
         return intent;
+    }
+
+    private void setLoading(boolean loading) {
+        if(loading) {
+            binding.notesList.setEnabled(false);
+            binding.fab.setEnabled(false);
+            binding.toolbar.setEnabled(false);
+            for(int i = 0; i < menu.size(); i++) {
+                menu.getItem(i).setEnabled(false);
+            }
+            binding.mainActivityProgressBar.setVisibility(View.VISIBLE);
+        }
+        else {
+            binding.notesList.setEnabled(true);
+            binding.fab.setEnabled(true);
+            binding.toolbar.setEnabled(true);
+            binding.mainActivityProgressBar.setVisibility(View.GONE);
+            for(int i = 0; i < menu.size(); i++) {
+                menu.getItem(i).setEnabled(true);
+            }
+        }
+    }
+
+    private void initNotesList(Future<List<NoteModel>> data) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            try {
+                List<NoteModel> notes = data.get();
+                runOnUiThread(() -> {
+                    notesAdapter = new NoteListAdapter(this, notes);
+                    binding.notesList.setAdapter(notesAdapter);
+                    setLoading(false);
+                });
+
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
@@ -218,18 +276,7 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar);
 
-        final ArrayList<NoteModel> list = new ArrayList<>();
-        for (int i = 0; i < 20; i ++) {
-            list.add(new NoteModel("Sample " + i, new Date()));
-        }
-
-        notesList = new ArrayList<>(list);
-
-        notesAdapter = new NoteListAdapter(
-                this,
-                new ArrayList<>(notesList)
-        );
-        binding.notesList.setAdapter(notesAdapter);
+        noteManager = new NoteManager(this);
 
         binding.notesList.setOnItemClickListener((parent, view, position, id) -> {
             NoteModel note = (NoteModel)parent.getAdapter().getItem(position);
@@ -246,11 +293,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+    public boolean onCreateOptionsMenu(Menu newMenu) {
 
-        MenuItem search = menu.findItem(R.id.action_search);
+        this.menu = newMenu;
+
+        getMenuInflater().inflate(R.menu.menu_main, newMenu);
+
+        MenuItem search = newMenu.findItem(R.id.action_search);
         SearchView sView = (SearchView) search.getActionView();
 
         sView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -267,7 +316,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        return super.onCreateOptionsMenu(menu);
+        Future<List<NoteModel>> noteListFuture = noteManager.getLocalNotes();
+        setLoading(true);
+        initNotesList(noteListFuture);
+
+        return super.onCreateOptionsMenu(newMenu);
     }
 
     @Override
@@ -283,5 +336,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public NoteManager getNoteManager() {
+        return noteManager;
     }
 }

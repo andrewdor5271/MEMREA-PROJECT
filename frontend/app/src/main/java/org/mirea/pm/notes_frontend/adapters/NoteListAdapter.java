@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import org.mirea.pm.notes_frontend.MainActivity;
 import org.mirea.pm.notes_frontend.R;
 
 import java.util.ArrayList;
@@ -29,9 +30,9 @@ public class NoteListAdapter extends ArrayAdapter<NoteModel> {
 
     private final Context context;
     private Filter filter;
-    private final ArrayList<NoteModel> values;
+    private final List<NoteModel> values;
 
-    public NoteListAdapter(@NonNull Context context, ArrayList<NoteModel> values) {
+    public NoteListAdapter(@NonNull Context context, List<NoteModel> values) {
         super(context, -1,  values);
         this.context = context;
         this.values = values;
@@ -77,7 +78,7 @@ public class NoteListAdapter extends ArrayAdapter<NoteModel> {
             popup.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.action_delete:
-                        // action
+                        ((MainActivity)context).deleteNote(values.get(position));
                     default:
                         break;
                 }

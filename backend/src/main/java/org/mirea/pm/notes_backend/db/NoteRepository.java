@@ -8,4 +8,5 @@ import java.util.List;
 public interface NoteRepository extends MongoRepository<Note, String>{
     List<Note> findByOwnerAndChangedDateTimeGreaterThan(User owner, LocalDateTime creationDateTime);
     List<Note> findByOwner(User owner);
+    void deleteByIdNotInAndOwner(List<String> ids, User owner);
 }

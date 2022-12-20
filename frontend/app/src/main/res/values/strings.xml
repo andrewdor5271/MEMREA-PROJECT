@@ -34,7 +34,8 @@
     <string name="url_signin">%1$s%2$s/api/auth/signin</string>
     <string name="url_extend_token">%1$s%2$s/api/auth/extend</string>
     <string name="url_user_data">%1$s%2$s/api/user/current</string>
-    <string name="url_create_note">%1$s%2$s/api/note/create</string>
+    <string name="url_upload_sync">%1$s%2$s/api/note/upload_sync</string>
+    <string name="url_all_notes">%1$s%2$s/api/note/all</string>
 
     <string name="bad_request_signin_error_message">Username or password incorrect</string>
     <string name="bad_request_signup_error_message">Username already taken</string>

@@ -25,6 +25,9 @@ public interface NoteDao {
     @Delete
     void delete(NoteModel note);
 
-    @Query("UPDATE notes SET text = :text, updateDate = :updateDate WHERE mongoId = :mongoId")
-    void updateByMongoId(String mongoId, String text, Date updateDate);
+    @Query("DELETE FROM notes WHERE mongoId = '' OR mongoId IS NULL")
+    void deleteWhereMongoIdIsEmpty();
+
+    @Query("DELETE FROM notes")
+    void clear();
 }
