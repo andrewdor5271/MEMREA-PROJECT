@@ -8,6 +8,16 @@
         android:title="@string/action_user"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_upload_sync"
+        android:orderInCategory="100"
+        android:title="@string/action_upload_sync"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_download_sync"
+        android:orderInCategory="100"
+        android:title="@string/action_download_sync"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_search"
         android:icon="@android:drawable/ic_menu_search"
         app:showAsAction="ifRoom|collapseActionView"

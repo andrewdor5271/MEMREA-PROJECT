@@ -5,6 +5,7 @@ import java.util.List;
 public class UploadSyncRequest {
     List<NoteStructure> notes;
 
+    public UploadSyncRequest(){}
     public UploadSyncRequest(List<NoteStructure> notes) {
         this.notes = notes;
     }

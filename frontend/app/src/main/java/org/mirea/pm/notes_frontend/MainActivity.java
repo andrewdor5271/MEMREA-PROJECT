@@ -224,7 +224,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initNotesList(Future<List<NoteModel>> data) {
+    private void initNotesList() {
+        Future<List<NoteModel>> data = noteManager.getLocalNotes();
+        setLoading(true);
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
@@ -277,6 +279,10 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
 
         noteManager = new NoteManager(this);
+        noteManager.setOnAuthErrorCallback(this::authActivity);
+        noteManager.setOnGenericNetworkErrorCallback(this::networkErrorToast);
+        noteManager.setOnUploadSyncReadyCallback(this::initNotesList);
+        noteManager.setOnDownloadSyncReadyCallback(this::initNotesList);
 
         binding.notesList.setOnItemClickListener((parent, view, position, id) -> {
             NoteModel note = (NoteModel)parent.getAdapter().getItem(position);
@@ -316,9 +322,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Future<List<NoteModel>> noteListFuture = noteManager.getLocalNotes();
-        setLoading(true);
-        initNotesList(noteListFuture);
+        initNotesList();
 
         return super.onCreateOptionsMenu(newMenu);
     }
@@ -333,6 +337,12 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_user) {
             userDetailsRequestAndDialog();
             return true;
+        }
+        else if(id == R.id.action_upload_sync) {
+            noteManager.uploadSync();
+        }
+        else if(id == R.id.action_download_sync) {
+            noteManager.downloadSync();
         }
 
         return super.onOptionsItemSelected(item);
