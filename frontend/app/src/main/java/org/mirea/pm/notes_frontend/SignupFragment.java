@@ -1,5 +1,8 @@
 package org.mirea.pm.notes_frontend;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,7 +14,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.mirea.pm.notes_frontend.databinding.FragmentSignupBinding;
+import org.mirea.pm.notes_frontend.util.Constants;
 import org.mirea.pm.notes_frontend.util_storage.JwtStorage;
 
 import java.io.IOException;
@@ -21,6 +27,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -75,6 +82,8 @@ public class SignupFragment extends Fragment {
                     .append("\"}")
                     .toString();
 
+            connection.setConnectTimeout(Constants.TIMEOUT);
+
             try(OutputStream ostream = connection.getOutputStream()) {
                 byte[] input = json.getBytes(StandardCharsets.UTF_8);
                 ostream.write(input, 0, input.length);
@@ -92,6 +101,7 @@ public class SignupFragment extends Fragment {
             }
     }
 
+    @SuppressLint("ApplySharedPref")
     private String requestSignin(String username, String password) throws IOException {
         String protocol = getString(R.string.protocol);
         String socket = getString(R.string.socket);
@@ -111,6 +121,8 @@ public class SignupFragment extends Fragment {
                 .append("\"}")
                 .toString();
 
+        connection.setConnectTimeout(Constants.TIMEOUT);
+
         try(OutputStream ostream = connection.getOutputStream()) {
             byte[] input = json.getBytes(StandardCharsets.UTF_8);
             ostream.write(input, 0, input.length);
@@ -120,6 +132,12 @@ public class SignupFragment extends Fragment {
             return getString(R.string.default_network_error_message);
         }
         processSigninResponse(connection.getInputStream());
+        SharedPreferences.Editor editor =
+                requireActivity().getSharedPreferences(
+                        Constants.PREFS_NAME,
+                        Context.MODE_PRIVATE).edit();
+        editor.putString(Constants.USERNAME_PREF_NAME, username);
+        editor.commit();
         return "";
     }
 
@@ -166,19 +184,11 @@ public class SignupFragment extends Fragment {
     private void processSigninResponse(InputStream stream) throws IOException {
         InputStreamReader reader = new InputStreamReader(
                 stream, StandardCharsets.UTF_8);
-        JsonReader jsonReader = new JsonReader(reader);
 
-        jsonReader.beginObject();
-        while (jsonReader.hasNext()) {
-            if(jsonReader.nextName().equals("token")) {
-                String token = jsonReader.nextString();
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, String> parsed = mapper.readValue(reader, Map.class);
 
-                JwtStorage.save(requireContext(), token);
-            }
-            else {
-                jsonReader.skipValue();
-            }
-        }
+        JwtStorage.save(requireContext(), (String) parsed.get("token"));
     }
 
     public SignupFragment() {

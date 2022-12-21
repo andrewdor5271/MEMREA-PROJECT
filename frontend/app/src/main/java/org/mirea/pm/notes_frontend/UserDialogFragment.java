@@ -18,6 +18,7 @@ public class UserDialogFragment extends DialogFragment {
     public static String TAG = "UserDialog";
 
     private final static String USERNAME_ARG_KEY = "username";
+    private Runnable logoutCallback;
 
     public static UserDialogFragment newInstance(String username) {
         UserDialogFragment fragment = new UserDialogFragment();
@@ -43,6 +44,10 @@ public class UserDialogFragment extends DialogFragment {
         binding.dismissButton.setOnClickListener(view -> dismiss());
 
         binding.logoutButton.setOnClickListener(view -> {
+
+            if(logoutCallback != null) {
+                logoutCallback.run();
+            }
             JwtStorage.clear(requireContext());
             Intent intent = new Intent(requireActivity(), AuthActivity.class);
             startActivity(intent);
@@ -53,4 +58,11 @@ public class UserDialogFragment extends DialogFragment {
         return builder.create();
     }
 
+    public Runnable getLogoutCallback() {
+        return logoutCallback;
+    }
+
+    public void setLogoutCallback(Runnable logoutCallback) {
+        this.logoutCallback = logoutCallback;
+    }
 }

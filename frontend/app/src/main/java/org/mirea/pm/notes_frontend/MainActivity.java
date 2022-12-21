@@ -2,6 +2,7 @@ package org.mirea.pm.notes_frontend;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -16,6 +17,7 @@ import org.mirea.pm.notes_frontend.adapters.NoteListAdapter;
 import org.mirea.pm.notes_frontend.data_managers.NoteManager;
 import org.mirea.pm.notes_frontend.datamodels.NoteModel;
 import org.mirea.pm.notes_frontend.databinding.ActivityMainBinding;
+import org.mirea.pm.notes_frontend.util.Constants;
 import org.mirea.pm.notes_frontend.util_storage.JwtStorage;
 
 import android.util.JsonReader;
@@ -79,28 +81,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void processUserDataResponseAndStartUserDialog(InputStream stream) throws IOException {
-        InputStreamReader reader = new InputStreamReader(
-                stream, StandardCharsets.UTF_8);
-        JsonReader jsonReader = new JsonReader(reader);
-
-        jsonReader.beginObject();
-        while (jsonReader.hasNext()) {
-            if(jsonReader.nextName().equals("username")) {
-                String username = jsonReader.nextString();
-
-                runOnUiThread(() -> {
-                    UserDialogFragment
-                            .newInstance(username)
-                            .show(getSupportFragmentManager(), UserDialogFragment.TAG);
-                });
-            }
-            else {
-                jsonReader.skipValue();
-            }
-        }
-    }
-
     public void updateAuth() {
         String oldJwt = JwtStorage.retrieve(this);
         if (oldJwt.isEmpty()) {
@@ -137,34 +117,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void userDetailsRequestAndDialog() {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> {
-            String protocol = getString(R.string.protocol);
-            String socket = getString(R.string.socket);
-            try {
-                URL url = new URL(getString(R.string.url_user_data, protocol, socket));
-
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("Accept", "application/json");
-                connection.setRequestProperty("Authorization", "Bearer " + JwtStorage.retrieve(this));
-
-                if(connection.getResponseCode() == 200) {
-                    processUserDataResponseAndStartUserDialog(connection.getInputStream());
-                }
-                else if(connection.getResponseCode() == 401) {
-                    runOnUiThread(this::authActivity);
-                }
-                else {
-                    networkErrorToast();
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+    public void userDetailsDialog() {
+        UserDialogFragment dialogFragment = UserDialogFragment.newInstance(getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE)
+                .getString(Constants.USERNAME_PREF_NAME, ""));
+        dialogFragment.setLogoutCallback(noteManager::logoutHandler);
+        dialogFragment.show(getSupportFragmentManager(), UserDialogFragment.TAG);
     }
 
     // call when you need to modify existing note
@@ -336,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_user) {
-            userDetailsRequestAndDialog();
+            userDetailsDialog();
             return true;
         }
         else if(id == R.id.action_upload_sync) {

@@ -66,6 +66,11 @@ public class NoteManager {
         this.onGenericNetworkErrorCallback = callback;
     }
 
+    public void logoutHandler() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(database.noteDao()::clear);
+    }
+
     public void uploadSync() {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
