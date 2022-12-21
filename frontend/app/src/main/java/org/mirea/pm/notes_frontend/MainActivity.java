@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void networkErrorToast() {
-        Toast.makeText(this, getString(R.string.default_network_error_message), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.default_network_error_message), Toast.LENGTH_LONG).show();
     }
 
     public void processAuthResponse(InputStream stream) throws IOException {
