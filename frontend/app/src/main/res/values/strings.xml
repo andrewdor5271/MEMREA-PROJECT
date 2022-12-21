@@ -52,4 +52,9 @@
 
     <string name="action_delete_note">Delete</string>
 
+    <string name="upload_sync_alert">Changes made on other devices may be lost! Do you want to proceed?</string>
+    <string name="download_sync_alert">Changes made on this device may be lost! Do you want to proceed?</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

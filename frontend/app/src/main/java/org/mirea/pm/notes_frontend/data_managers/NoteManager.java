@@ -159,51 +159,39 @@ public class NoteManager {
                 URL url = new URL(activity.getString(R.string.url_all_notes, protocol, socket));
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
+                connection.setRequestMethod("GET");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("Accept", "application/json");
                 connection.setRequestProperty("Authorization", "Bearer " + JwtStorage.retrieve(activity));
 
                 SimpleDateFormat format = new SimpleDateFormat(INTERNAL_DATE_TIME_FORMAT, Locale.getDefault());
-                if(connection.getResponseCode() == 200) {
+                int code = connection.getResponseCode();
+                if(code == 200) {
                     database.noteDao().clear();
-                    InputStreamReader reader = new InputStreamReader(
-                            connection.getInputStream(), StandardCharsets.UTF_8);
-                    JsonReader jsonReader = new JsonReader(reader);
 
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.setDateFormat(format);
 
-                    jsonReader.beginArray();
-                    while (jsonReader.hasNext()) {
+                    Map<String, Object> parsed = mapper.readValue(connection.getInputStream(), Map.class);
 
-                        jsonReader.beginObject();
+                    List<Map<String, Object>> notes =
+                            (ArrayList<Map<String, Object>>) parsed.get("notes");
 
-                        String text = "";
-                        String mongoId = "";
-                        Date updateDate = new Date();
-                        while (jsonReader.hasNext()) {
-                            switch (jsonReader.nextName()) {
-                                case "id":
-                                    mongoId = jsonReader.nextString();
-                                    break;
-                                case "text":
-                                    text = jsonReader.nextString();
-                                    break;
-                                case "updateTime":
-                                    updateDate = format.parse(jsonReader.nextString());
-                                    break;
-                            }
-                            NoteModel newNote = new NoteModel(text, updateDate);
-                            newNote.setMongoId(mongoId);
-                            database.noteDao().insert(newNote);
-                        }
-                        jsonReader.endObject();
+                    assert notes != null;
+                    for(Map<String, Object> elem : notes) {
+                        NoteModel newNote = new NoteModel(
+                                (String) elem.get("text"),
+                                format.parse((String) elem.get("updateTime"))
+                        );
+                        newNote.setMongoId((String) elem.get("id"));
+                        database.noteDao().insert(newNote);
                     }
 
-                    if(onDownloadSyncReadyCallback != null) {
-                        activity.runOnUiThread(onDownloadSyncReadyCallback);
+                    if(onUploadSyncReadyCallback != null) {
+                        activity.runOnUiThread(onUploadSyncReadyCallback);
                     }
                 }
-                else if(connection.getResponseCode() == 401) {
+                else if(code == 401) {
                     if(onAuthErrorCallback != null) {
                         activity.runOnUiThread(onAuthErrorCallback);
                     }

@@ -1,6 +1,7 @@
 package org.mirea.pm.notes_frontend;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -339,10 +340,20 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         else if(id == R.id.action_upload_sync) {
-            noteManager.uploadSync();
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.action_upload_sync))
+                    .setMessage(getString(R.string.upload_sync_alert))
+                    .setPositiveButton(R.string.yes, (dialog, which) -> noteManager.uploadSync())
+                    .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                    .show();
         }
         else if(id == R.id.action_download_sync) {
-            noteManager.downloadSync();
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.action_download_sync))
+                    .setMessage(getString(R.string.download_sync_alert))
+                    .setPositiveButton(R.string.yes, (dialog, which) -> noteManager.downloadSync())
+                    .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                    .show();
         }
 
         return super.onOptionsItemSelected(item);
