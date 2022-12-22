@@ -72,9 +72,7 @@ public class Note {
         if (!(other instanceof Note otherNote)) {
             return false;
         }
-        return id.equals(otherNote.getId()) &&
-                text.equals(otherNote.getText()) &&
-                changedDateTime.equals(otherNote.getChangedDateTime());
+        return id.equals(otherNote.getId());
     }
 
     @Override
